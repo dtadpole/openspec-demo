@@ -1,0 +1,63 @@
+schema: spec-driven
+
+# Project context shown to AI when creating artifacts
+context: |
+  Tech stack: Python 3.12 (stdlib only for app code — no runtime dependencies)
+  Test framework: pytest (declared as dev dependency in pyproject.toml)
+  Package manager: uv (project-local .venv created via `uv venv`)
+  Layout:
+    - notes/         — application package
+    - tests/         — pytest test files (test_*.py)
+    - .venv/         — project-local virtualenv (gitignored)
+    - pyproject.toml — project + dev dependencies + pytest config
+    - notes.json     — runtime data file (gitignored)
+  Conventions:
+    - Always run Python via the project venv: `.venv/bin/python` or `.venv/bin/pytest`
+    - To install a new dev dependency:
+        `uv pip install --python .venv/bin/python <pkg>`
+      then add it under [dependency-groups].dev in pyproject.toml
+    - CLI invoked via `.venv/bin/python -m notes.cli <subcommand>`
+    - All errors print to stderr and exit with non-zero code
+    - All success output goes to stdout
+
+# Per-artifact rules — applied automatically when AI drafts artifacts
+rules:
+  general:
+    - >
+      All project changes (code, tests, specs, design) MUST go through a
+      change folder created by /opsx:propose. Never modify code, tests,
+      or files under openspec/specs/ directly outside of an active change.
+    - >
+      If you find an inconsistency between code/tests/specs, do NOT patch
+      it in place. Open a new change to fix it — even if the fix is
+      "spec-only" or "test-only" with no code change.
+    - >
+      Capability names in proposal.md ("New Capabilities: <name>") are
+      authoritative. Before creating a new capability folder under specs/,
+      verify with the user that a NEW capability is genuinely needed
+      rather than ADDING a requirement to an existing capability.
+
+  proposal:
+    - Keep proposals focused — one capability change per proposal when possible.
+    - Include a "Why" section that names the user problem.
+
+  tasks:
+    - ALWAYS include a numbered "## Tests" section as the LAST section.
+    - >
+      The Tests section MUST contain one task per scenario in the delta spec.
+      Each task should reference the scenario name in the format
+      "Test scenario: <Scenario Name>".
+    - The Tests section MUST end with a task "Run `pytest` and confirm all tests pass".
+    - Test files live under tests/ as test_<module>.py.
+    - Implementation tasks must be ordered before Tests tasks.
+
+  design:
+    - Keep design.md short for small changes (under 200 words is fine).
+    - Always include a "Goals / Non-Goals" section.
+    - For decisions, briefly note the alternative considered.
+
+  spec:
+    - Use SHALL / MUST / MUST NOT (RFC 2119 keywords) in requirement text.
+    - Every Requirement must have at least one Scenario.
+    - Scenarios use **GIVEN / WHEN / THEN / AND** in bold.
+    - Prefer concrete CLI invocations in WHEN clauses (e.g., `notes add --title "X"`).

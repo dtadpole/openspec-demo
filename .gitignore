@@ -1,0 +1,10 @@
+# Project venv (created with uv)
+.venv/
+__pycache__/
+*.pyc
+
+# Runtime data
+notes.json
+
+# OS
+.DS_Store
